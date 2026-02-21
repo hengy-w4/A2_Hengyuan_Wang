@@ -1,0 +1,411 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+	<title>Vis & Society Assignment 2</title>
+	<link rel="stylesheet" href="https://vis-society.github.io/assignments/report.css" />
+</head>
+
+<body>
+	<header>
+		<h1>
+			<small>Assignment 2</small>
+			Exploratory Data Analysis
+		</h1>
+
+		<p>
+			<strong>Hengyuan Wang</strong> — <em>hengyuan@mit.edu</em>
+		</p>
+	</header>
+	<main>
+		<section>
+			<h2>Subtheme: Housing Financialization and Speculative Investment in Boston</h2>
+			<h3>Dataset</h3>
+
+			<p>
+			This project draws on two major datasets focused on residential real estate transactions and ownership patterns in the City of Boston. Together, they enable both transaction-level and neighborhood-level analysis of speculative investment and ownership trends over more than two decades.
+			</p>
+
+			<p>
+			The first dataset contains all residential sales transactions in the City of Boston from 2000 to 2023. It includes detailed information about each sale, such as buyer and seller identities, sale price, property location, and whether the transaction qualifies as a “flip.” This dataset allows for the examination of investor participation over time, calculation of flip profits, and identification of spatial concentrations of speculative purchasing. Because it spans more than twenty years, it enables analysis of long-term trends, including a holistic overview of the housing ownership cumulation by investor types and changes in their investment portfolio in terms of property types.
+			</p>
+
+			<p>
+			The second dataset contains neighborhood-level corporate ownership rates and owner-occupancy rates from 2004 to 2024. It provides aggregate measures of the proportion of housing stock owned by corporations as well as the proportion occupied by resident homeowners. This dataset enables analysis of broader structural shifts in ownership patterns, including the rise of corporate or absentee ownership and potential declines in resident occupancy. The inclusion of this dataset complements the transaction-level dataset by capturing structural changes that may not be immediately visible in individual sales records. While the first dataset focuses on observed transaction behavior and measurable trends such as investor participation and flipping activity, the ownership dataset provides contextual evidence of longer-term shifts in housing control. Together, the two datasets allow us to take a more integrated gaze at the speculative dynamics by linking short-term investment behavior with evolving ownership structure.
+			</p>
+
+			<p>
+			On top of these two primary datasets, additional tools were used for the sake of visualization. A spatial data of the city of Boston is procured from OpenStreetMap to visualize geographical trends of property investment. The visualizations are generated in both Tableau and R.
+			</p>
+
+			<h3>Overall Analysis Questions</h3>
+			<ol>
+				<li>
+					<strong>How has investor participation in Boston’s housing market evolved over time, and has institutional involvement become structurally embedded rather than cyclical?</strong>
+					<h4>Motivation for Question 1</h4>
+
+					<p>
+					The MAPC report <em>Homes for Profit</em> documents rising investor acquisition across Greater Boston and raises concerns about consolidation by large and institutional actors. One finding that particularly stood out was that nearly a quarter of single-family homes and a fifth of two-family homes purchased by large or institutional investors were flipped, compared to just 8–9% for non-investor buyers. This stark difference suggests that large-scale investors may engage in housing primarily as an investment vehicle rather than as long-term residential property holders.
+					</p>
+
+					<p>
+					As an international resident who recently navigated Boston’s rental market, this issue also resonates personally. During my search for housing, I often contacted what appeared to be individual homeowners on Zillow, drawn in by personal listings and intimate apartment photos, only to find institutional agents representing investment entities. This experience sharpened my awareness of how ownership structures may be shifting beneath the surface of the housing market.
+					</p>
+
+					<p>
+					ProPublica’s <em>When Private Equity Becomes Your Landlord</em> further reinforces this concern, arguing that institutional ownership can transform housing from a social good into a financial asset. Together, these readings motivated Question 1: to empirically assess whether investor participation—particularly among large and institutional actors—has increased over time in Boston, and whether this shift reflects broader patterns of housing financialization.
+					</p>
+				</li>
+
+				<li>
+					<strong>Where is speculative investment geographically concentrated within Boston?</strong>
+					<h4>Motivation for Question 2</h4>
+
+					<p>
+					Prior research suggests that investor activity clusters spatially rather than distributing evenly across cities. The MAPC report <em>Homes for Profit</em> documents concentration in specific municipalities across Greater Boston, raising the question of whether similar geographic clustering occurs within Boston neighborhoods themselves. If investor participation is spatially concentrated, its effects on affordability and displacement may also be unevenly distributed.
+					</p>
+
+					<p>
+					Boston’s urban structure makes this question particularly compelling. The city is characterized by distinct institutional and economic clusters, including major universities, medical campuses, biotechnology corridors, and financial districts. These areas generate consistent housing demand and price appreciation pressures. It is therefore plausible that large and institutional investors strategically target neighborhoods near these economic anchors, where rental demand and resale value may be more predictable.
+					</p>
+
+					<p>
+					At the same time, some historically lower-income or transitioning neighborhoods may attract investors seeking appreciation opportunities. Examining the spatial distribution of investor purchases allows for a more nuanced understanding of whether speculative investment is concentrated in high-demand cores, emerging neighborhoods, or both. This motivates Question 2: to identify whether speculative activity is geographically clustered within Boston and to assess how localized investor dominance may reshape specific housing submarkets.
+					</p>
+				</li>
+
+				<li>
+					<strong><li>
+Are speculative flippings driven by profit, structural financialization of housing, or does it operate cyclically within broader market turnover dynamics?
+</li></strong>
+					<h4>Motivation for Question 3</h4>
+
+<p>
+Having examined investor participation and spatial concentration, Question 3 shifts attention to the economic logic underlying speculative activity. The MAPC report <em>Homes for Profit</em> argues that short-term resale enables investors to extract substantial gains, particularly during periods of rapid price appreciation. This raises a deeper question: are speculative flips primarily driven by profit maximization and structural financialization of housing, or do they operate cyclically within broader housing market turnover dynamics?
+</p>
+
+<p>
+Using the dataset’s engineered flip indicators (<code>flip_ind</code>, <code>flip_term</code>, <code>price_diff</code>, <code>price_diff_pch</code>), I analyze the distribution of flip profits, the prevalence of short holding periods, and temporal variation in resale intensity. Examining both raw and log-transformed returns allows for distinction between extreme outliers and typical gains, providing a clearer understanding of whether flipping represents exceptional windfalls or systematic profitability.
+</p>
+
+<p>
+By linking resale profitability and flip frequency to investor type, ownership structure, and occupancy trends, this analysis evaluates whether speculative activity reflects structural capital accumulation or cyclical market liquidity conditions. Understanding whether flipping intensifies alongside ownership convergence or instead tracks broader participation dynamics provides critical insight into the economic drivers behind the patterns identified in Questions 1 and 2.
+</p>
+				</li>
+			</ol>
+
+		</section>
+
+		<section>
+			<h2>Discoveries & Insights</h2>
+			<h3>Data Quality & Diagnostics</h3>
+
+			<h4>1. Investor Classification and Outlier Detection</h4>
+
+			<figure>
+				<img src="Imgs/institutional_outlier_analysis.png" alt="Institutional investor outlier analysis" />
+				<figcaption>
+				Institutional investor outlier analysis identifying extreme transaction concentrations across ZIP-year combinations.
+				</figcaption>
+			</figure>
+
+			<p>
+			To validate the integrity of the <code>investor_type_purchase</code> classifications, I conducted an outlier analysis of institutional investor activity. The visualization examines extreme transaction volumes and unusually large purchase concentrations by institutional buyers.
+			</p>
+
+
+			<h4>2. Geographic Distribution and Coordinate Validation</h4>
+
+			<p>
+			Latitude and longitude values were filtered to fall within Boston’s geographic bounding box. Transactions outside this range were excluded to prevent spatial distortion in density maps.
+			</p>
+
+			<p>
+			Although no separate graphical test was conducted, spatial density maps were visually inspected to confirm that clustering patterns aligned with plausible Boston neighborhoods.
+			</p>
+
+
+			<h4>3. Flip Profitability, Holding Period, and Ownership Diagnostics</h4>
+
+			<figure>
+				<img src="Imgs/flip_data_quality_diagnostics_grid.png" alt="Flip data diagnostics grid" />
+				<figcaption>
+				Diagnostic grid examining flip holding periods, raw and percentage returns, and ownership structure anomalies.
+				</figcaption>
+			</figure>
+
+			<p>
+			Flip-related variables (<code>flip_ind</code>, <code>flip_term</code>, <code>price_diff</code>, <code>price_diff_pch</code>) were evaluated using a diagnostic grid.
+			</p>
+
+			<ul>
+				<li>Negative holding periods were removed as implausible sequencing errors.</li>
+				<li>Extreme right-skew in profit distributions was addressed using log transformation for visualization.</li>
+				<li>High-percentage-return outliers were retained but visually separated to avoid distortion.</li>
+			</ul>
+
+			<h3>Question 1: How has investor participation in Boston’s housing market evolved over time, and has institutional involvement become structurally embedded rather than cyclical?</h3>
+
+			<p>
+			For clarity in downstream analyses, small and medium investors are aggregated into a single “Other” category, while large and institutional investors are kept separate to preserve distinctions among scale-driven actors.
+			</p>
+
+			<!-- 1. Transactions by Year -->
+			<figure>
+				<img src="Imgs/transactions_by_year_3group.png" alt="Transactions by investor group over time" />
+				<figcaption>
+				Annual residential transactions by investor group (3-group classification).
+				</figcaption>
+			</figure>
+
+			<p>
+			Overall transaction volume reflects broader macroeconomic cycles, including a pronounced contraction during the 2008 financial crisis and a steady recovery thereafter. However, participation by institutional and large investors exhibits disproportionate fluctuation after 2012. In particular, institutional activity appears more temporally sensitive: increases and decreases in institutional transactions often precede similar directional movements among large and other investors, and the magnitude of institutional shifts tends to be more pronounced.
+			</p>
+
+			<p>
+			Although “Other” investors remain numerically dominant in aggregate counts, the sustained upward trajectory of institutional and large investor transactions in the post-crisis period suggests structural expansion rather than temporary cyclical entry. Moreover, the apparent leading behavior of institutional activity raises the possibility that these actors may influence or signal broader investment patterns within the housing market. While this analysis does not establish causality, the temporal sequencing is consistent with the interpretation that institutional investors hold disproportionate market influence relative to their transaction share.
+			</p>
+
+
+			<!-- 2. Cumulative Purchases -->
+			<figure>
+				<img src="Imgs/cumulative_residential_institutional_vs_large.png" alt="Cumulative purchases institutional vs large" />
+				<figcaption>
+				Cumulative residential purchases for institutional and large investors.
+				</figcaption>
+			</figure>
+
+			<p>
+			The cumulative curves show sustained acceleration for both large and institutional investors after 2012, with the slope steepening relative to earlier years. The divergence between the two lines indicates that institutional participation grows steadily but remains below large investors in total scale. Importantly, the absence of flattening in recent years suggests that institutional entry is not temporary or cyclical. This pattern reinforces the interpretation that larger actors are increasingly embedded in Boston’s housing market.
+			</p>
+
+
+			<!-- 4. Investor Share Pie Snapshots -->
+			<figure>
+				<img src="Imgs/investor_share_pie_snapshots.png" alt="Investor share snapshots over time" />
+				<figcaption>
+				Snapshots of investor purchase share across selected years.
+				</figcaption>
+			</figure>
+
+			<p>
+			These snapshot pie charts illustrate a clear “tug-of-war” dynamic between smaller investors (Small + Medium) and larger actors (Large + Institutional) over time. In the early 2000s, smaller investors dominate transaction share, collectively accounting for the majority of purchases. Following the 2008 financial crisis, however, institutional and large investors expand their relative presence, particularly visible in 2013 and 2018, when their combined share increases noticeably.
+			</p>
+
+			<p>
+			By 2022, both large and institutional investors exhibit a decline in purchase share, a shift that is notable given their prior post-crisis expansion. Overall, large investors appear to maintain a relatively stable long-term market presence, while the share held by small investors fluctuates more substantially across periods. This pattern suggests that although smaller investors numerically dominate in many years, larger actors maintain a persistent structural foothold in the market.
+			</p>
+
+			<p>
+			To better understand the nature of this foothold, the next section examines the composition and scale of larger investors’ portfolios in greater detail, exploring how their transaction behavior differs from that of smaller participants.
+			</p>
+
+
+			<!-- 5. Residential Property Share: Large vs Institutional -->
+			<figure>
+				<div style="display: flex; gap: 20px; justify-content: center; align-items: flex-start;">
+					<div>
+						<img src="Imgs/residential_property_share_large.png" alt="Residential property share large investors" style="max-width: 100%;" />
+					</div>
+					<div>
+						<img src="Imgs/residential_property_share_institutional.png" alt="Residential property share institutional investors" style="max-width: 100%;" />
+					</div>
+				</div>
+				<figcaption>
+				Comparison of residential property share composition for large and institutional investors across selected years.
+				</figcaption>
+			</figure>
+
+			<p>
+			Building on the earlier evidence of sustained post-crisis expansion and temporal leadership among institutional actors, the portfolio composition plots reveal a clear structural shift toward condominium investments. Over time, both large and institutional investors exhibit increasing portfolio concentration, but the timing and intensity differ across the two groups.
+			</p>
+
+			<p>
+			A same-year comparison suggests a competitive dynamic in condo acquisition. In several observed years, the share of condo transactions within institutional portfolios rises precisely when the condo share within large-investor portfolios declines, and vice versa. This near-mutually exclusive pattern implies that the two groups may be competing over a similar asset class rather than diversifying into separate segments. When institutional actors concentrate heavily on condos, large investors appear to shift toward other residential property types; when institutional concentration loosens, large investors expand their condo share.
+			</p>
+
+			<p>
+			Condominiums, particularly in Boston’s high-density and centrally located neighborhoods, offer liquidity, standardized units, and scalable rental potential. The observed alternating dominance in condo portfolios suggests strategic positioning rather than random fluctuation. Institutional actors may leverage greater capital depth to accumulate condo units in concentrated waves, while large investors respond by reallocating across property types.
+			</p>
+
+			<p>
+			This competitive specialization strengthens earlier findings from the “tug-of-war” in overall market share. While small investors fluctuate numerically, large and institutional investors appear to engage in a more strategic contest over high-value asset classes—particularly condos. The portfolio evidence therefore reinforces the interpretation that institutional participation is not only expanding in volume but actively shaping the structure of Boston’s housing market through targeted and competitive capital deployment.
+			</p>
+
+			<!-- 3. Purchase Growth Grid -->
+			<figure>
+				<img src="Imgs/purchase_growth_color_grid.png" alt="Purchase growth by investor group and property type" />
+				<figcaption>
+				Purchase growth by investor group and property type.
+				</figcaption>
+			</figure>
+
+			<p>
+			Growth patterns vary substantially across property types. Institutional purchases appear concentrated in specific housing categories rather than evenly distributed, while large investors show broader participation. This indicates strategic acquisition behavior rather than passive market entry. The differentiated growth patterns strengthen the argument that rising participation among large and institutional investors reflects intentional expansion strategies rather than random fluctuations.
+			</p>
+
+			<h3>Question 2: Where is speculative investment geographically concentrated within Boston?</h3>
+
+			<!-- 1. Density Maps -->
+			<figure>
+				<img src="Imgs/density_maps_3groups.png" alt="Density maps by investor group" />
+				<figcaption>
+				Density maps of residential purchases by investor group.
+				</figcaption>
+			</figure>
+
+			<p>
+			The density maps show pronounced spatial clustering of investor activity across Boston. Institutional purchases are concentrated in a narrow band spanning western-central neighborhoods. Large investors exhibit a similar geographic footprint, with dense transaction zones overlapping these central corridors. The density graph of “Other” investors is noticeably smaller in intensity and spatial spread. Institutional and large investors occupy clearly defined acquisition zones, forming identifiable investment corridors rather than scattered citywide participation.
+			</p>
+
+			<!-- 2. Dominant Investor by ZIP -->
+			<figure>
+				<img src="Imgs/Dominant Investor by Zip.png" alt="Dominant investor by ZIP code" />
+				<figcaption>
+				ZIP-code level classification of dominant investor type.
+				</figcaption>
+			</figure>
+
+			<p>
+			The ZIP-level dominance map further reinforces spatial concentration patterns. While small investors may dominate in aggregate transaction counts, certain ZIP codes are structurally dominated by large or institutional investors. These dominant clusters appear in both central and emerging neighborhoods. This visualization strengthens the conclusion that speculative investment is geographically uneven and concentrated in identifiable submarkets within Boston.
+			</p>
+
+			<h4>How “Dominant Investor” is Calculated in Tableau</h4>
+
+			<p>
+			The dominant investor classification is computed using a windowed percentage share within each ZIP code.
+			</p>
+
+			<p>
+			First, the investor purchase share is calculated as:
+			</p>
+
+			<p>
+			<code>
+			COUNT([Investor Type Purchase]) 
+			/ 
+			WINDOW_SUM(COUNT([Investor Type Purchase]))
+			</code>
+			</p>
+
+			<p>
+			This calculation computes the proportion of transactions attributable to each investor type within a given ZIP, where the denominator is the total number of transactions in that ZIP.
+			</p>
+
+			<p>
+			Next, the dominant investor is determined by identifying the investor type with the maximum purchase share within the ZIP:
+			</p>
+
+			<p>
+			<code>
+			IF [Investor Purchase Share (Percentage)] 
+			= WINDOW_MAX([Investor Purchase Share (Percentage)]) 
+			THEN ATTR([Investor Type Purchase]) 
+			END
+			</code>
+			</p>
+
+			<p>
+			This logic assigns dominance to the investor type whose percentage share is highest within the ZIP-level window. Using percentage share rather than raw transaction counts ensures that dominance reflects proportional influence rather than scale differences across ZIP codes.
+			</p>
+
+			<h4>Interpreting the Dominance Paradox</h4>
+
+			<p>
+An important structural pattern emerges when comparing citywide transaction shares to ZIP-level dominance. While small and medium investors account for the largest total number of transactions across Boston, many individual ZIP codes are classified as dominated by institutional and large investors.			</p>
+
+			<p>
+			This apparent contradiction arises because aggregate market share and localized dominance measure different dimensions of influence. Citywide totals capture overall scale, whereas ZIP-level dominance reflects proportional control within a local housing submarket.
+			</p>
+
+			<p>
+			In practical terms, small investors may transact frequently across many neighborhoods, generating high aggregate volume. However, large investors may concentrate heavily within specific ZIP codes, capturing the highest percentage share in those localized markets. As a result, large investors can exert strong structural influence in certain neighborhoods even if they do not dominate the citywide transaction count.
+			</p>
+
+			<p>
+			This distinction is crucial for understanding geographic concentration. It suggests that speculative investment is not evenly distributed, and that market power may be spatially concentrated. Therefore, evaluating dominance at the ZIP level provides a more precise lens for identifying localized investor influence than aggregate statistics alone.
+			</p>
+
+			<h3>Question 3: To what extent does short-term flip activity move with shifts in owner occupancy and corporate ownership, and what does this reveal about the role of speculation within Boston’s housing market?
+</h3>
+
+			<figure>
+				<div style="display: flex; gap: 30px; justify-content: center; align-items: flex-start;">
+					<div style="flex: 1;">
+						<img src="Imgs/flip_profit_raw_histogram.png" 
+							alt="Raw flip profit distribution" 
+							style="width: 100%;" />
+					</div>
+					<div style="flex: 1;">
+						<img src="Imgs/flip_profit_log_histogram.png" 
+							alt="Log-scale flip profit distribution" 
+							style="width: 100%;" />
+					</div>
+				</div>
+				<figcaption>
+				Comparison of raw and log-scale flip profit distributions for institutional and large investors.
+				</figcaption>
+			</figure>
+
+			<p>
+			The raw profit distribution is heavily right-skewed, with extreme outliers dominating the visual scale and compressing the majority of observations near zero. This makes it difficult to evaluate typical profitability. After applying a log transformation, the distribution becomes more interpretable, revealing that most positive flip profits cluster within a narrower range rather than being uniformly extreme. This confirms that while a small number of flips generate exceptionally large gains, typical profitable flips occur at more moderate levels. The comparison strengthens the analysis of Q3 by distinguishing between headline outliers and central profitability trends.
+			</p>
+
+
+			<figure>
+				<img src="Imgs/speculative_intensity_buy_side_flip.png" alt="Speculative flip intensity and resale probability" />
+				<figcaption>
+				Resale probability and share of purchases later resold, overall and by investor type.
+				</figcaption>
+			</figure>
+
+			<p>
+			The share of purchases later resold increases notably after 2010, indicating rising speculative activity during the post-crisis recovery period. Large investors exhibit the highest resale probability overall, while institutional investors also display elevated resale rates relative to small actors. The timing of these increases aligns with broader housing market appreciation, suggesting that improving market conditions may have incentivized short-term resale strategies. This pattern supports the interpretation that speculative intensity increased over time.
+			</p>
+
+			<div style="display: flex; gap: 20px;">
+
+				<figure style="flex: 1;">
+					<img src="Imgs/divergence_plot.png" alt="Divergence between corporate ownership and owner occupancy" />
+					<figcaption>
+					Divergence between corporate ownership rate and owner-occupancy rate over time.
+					</figcaption>
+				</figure>
+
+				<figure style="flex: 1;">
+					<img src="Imgs/flip_vs_owner_occ_trend.png" alt="Short-term flip rate vs owner occupancy trend" />
+					<figcaption>
+					Short-term flip rate alongside owner-occupancy trend over time.
+					</figcaption>
+				</figure>
+
+			</div>
+<p>
+The divergence plot shows a steady narrowing gap between owner-occupancy and corporate ownership rates over time. Corporate ownership increases from roughly 5–6% in the mid-2000s to above 20% by 2022, while owner occupancy declines from the mid-40% range to below 40%. The contraction of the shaded gap reflects a structural shift in tenure composition, indicating gradual convergence between corporate ownership and resident-held housing share.
+</p>
+
+<p>
+More notably, the second figure shows that short-term flip activity moves in the same direction as owner occupancy for much of the observed period. Flip rates increase during years when owner occupancy stabilizes or temporarily rises—particularly between 2013 and 2016—and decline when owner occupancy resumes its downward trend. This co-movement suggests that short-term resale intensity may be closely tied to broader housing market liquidity and participation conditions.
+</p>
+		<section>
+<h2>Summary</h2>
+
+<p>
+Over two decades of residential transactions, Boston’s housing market shows sustained growth in participation by large and institutional investors, particularly after the post-2012 recovery. While small investors remain numerous in aggregate counts, cumulative purchase trajectories and market share dynamics indicate that larger actors maintain a persistent structural presence rather than a purely cyclical one.
+</p>
+
+<p>
+Spatial analysis reveals clear geographic clustering. Large and institutional investors concentrate in specific neighborhoods and, in many ZIP codes, capture the highest proportional purchase share despite not dominating citywide totals. This distinction between aggregate volume and localized dominance highlights spatially concentrated investor influence.
+</p>
+
+<p>
+Flip profitability analysis shows that while extreme gains exist, typical resale returns are moderate and highly skewed. Short-term flip activity rises after 2010 and appears to move in tandem with broader occupancy trends, suggesting that speculation responds to market turnover and liquidity conditions rather than operating independently.
+</p>
+
+<p>
+Taken together, the evidence indicates that large and institutional investors are increasingly embedded and strategically active in Boston’s housing market. Their participation is geographically concentrated and structurally persistent, while speculative flipping appears cyclical and intertwined with broader housing dynamics.
+</p>
+
+		</section>
+	</main>
+</body>
+</html>
